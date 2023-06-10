@@ -3,6 +3,7 @@
 namespace includes;
 
 use includes\Base\Admin;
+use includes\Base\Options;
 
 class Init {
 	/**
@@ -12,7 +13,8 @@ class Init {
 	public static function getServices()
 	{
 		return [
-			Admin::class
+			Admin::class,
+			Options::class
 		];
 	}
 

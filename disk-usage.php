@@ -20,7 +20,10 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'DISK_USAGE_VERSION', '1.0.0' );
+
+$worker_time = get_option('disk_usage_worker_time');
+
+define('DISK_USAGE_VERSION', '1.0.0');
 
 // Require once for the composer autoload
 if (file_exists(dirname( __FILE__ ) . '/vendor/autoload.php')) {
