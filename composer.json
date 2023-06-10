@@ -1,0 +1,17 @@
+{
+    "name": "knomic/disk-usage",
+    "description": "Disk Usage Plugin",
+    "type": "project",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Samson Moses",
+            "email": "knomic10@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {"includes\\": "./includes"}
+    }
+}
