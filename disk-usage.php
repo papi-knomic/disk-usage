@@ -45,6 +45,6 @@ function deactivatePlugin() {
 
 register_deactivation_hook( __FILE__, 'deactivatePlugin');
 
-//if ( class_exists( 'includes\\init' ) ) {
-//	includes\Init::registerServices();
-//}
+if ( class_exists( 'includes\\init' ) ) {
+	includes\Init::registerServices();
+}
