@@ -12,9 +12,15 @@ class Ajax extends BaseController
 
 	public function gatherDiskUsageResults ():void
 	{
-		$usage_stats = []; // Replace with your code to gather the usage stats
+		var_dump('omo');
+		die();
+		$usage_stats_exist = get_option('disk_usage_stats_exists');
+		if ( empty($usage_stats_exist) ) {
+			update_option('disk_usage_stats_exists', false);
+		}
 
-		// Return the gathered usage stats in the AJAX response
+		$usage_stats = [];
+
 		wp_send_json($usage_stats);
 	}
 }

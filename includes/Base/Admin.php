@@ -23,7 +23,7 @@ class Admin extends BaseController
 
     public function mainPageRender(): void
     {
-	    $usage_stats_exist = get_option('DISK_USAGE_STATS_EXISTS');
+	    $usage_stats_exist = get_option('disk_usage_stats_exists');
 		$usage_stats_exist = (bool)$usage_stats_exist ?? false;
         require_once $this->plugin_path . 'templates/admin.php';
     }

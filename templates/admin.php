@@ -10,8 +10,7 @@
 //	echo '<p>No usage stats found. Please click the button below to start gathering results.</p>';
 //}
 //
-//echo '<h2>Controls</h2>';
-//echo '<button id="gather-results-btn">Gather Results</button>';
+
 //
 //echo '</div>';
 
@@ -27,24 +26,10 @@
 		<!-- Content for Tab 1 goes here -->
 	</div>
 	<div id="tab2" class="tab-panel">
-		<!-- Content for Tab 2 goes here -->
+        <h2>Controls</h2>
+       <button id="gather-results-btn">Gather Results</button>
 	</div>
 </div>
-
-
-<script>
-    jQuery(document).ready(function($) {
-        $('.nav-tab').click(function(e) {
-            e.preventDefault();
-
-            $('.nav-tab').removeClass('nav-tab-active');
-            $(this).addClass('nav-tab-active');
-
-            $('.tab-panel').hide();
-            $($(this).attr('href')).show();
-        });
-    });
-</script>
 
 
 

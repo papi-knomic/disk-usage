@@ -3,6 +3,8 @@
 namespace includes;
 
 use includes\Base\Admin;
+use includes\Base\Ajax;
+use includes\Base\Enqueue;
 use includes\Base\Options;
 
 class Init {
@@ -14,7 +16,9 @@ class Init {
 	{
 		return [
 			Admin::class,
-			Options::class
+			Options::class,
+			Enqueue::class,
+			Ajax::class
 		];
 	}
 
