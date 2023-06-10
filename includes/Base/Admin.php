@@ -25,6 +25,8 @@ class Admin extends BaseController
     {
 	    $usage_stats_exist = get_option('disk_usage_stats_exists');
 		$usage_stats_exist = (bool)$usage_stats_exist ?? false;
+
+
         require_once $this->plugin_path . 'templates/admin.php';
     }
 
@@ -42,13 +44,6 @@ class Admin extends BaseController
 
 	public function settingsPageRender(): void
 	{
-		if (isset($_POST['submit'])) {
-			$worker_time = sanitize_text_field($_POST['disk_usage_worker_time']);
-			update_option( 'disk_usage_worker_time', $worker_time);
-			echo '<div class="notice notice-success is-dismissible"><p>Options saved.</p></div>';
-		}
-
-		$pluginOptionGroup = 'wp_disk_usage_option_group';
 		require_once $this->plugin_path . 'templates/settings.php';
 	}
 }

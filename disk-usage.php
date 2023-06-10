@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Plugin Name: Disk Usage
+ * Plugin Name: WP Disk Usage
  * Plugin URI: https://github.com/papi-knomic/disk-usage
  * Description: The Disk Usage Plugin is a WordPress plugin that provides users with information about the disk usage of their website
  * Version: 1.0
  * Author: Samson Moses
  * Author URI: https://github.com/papi-knomic
- * Text Domain: disk-usage
+ * Text Domain: wp-disk-usage
 */
 
 //Stops file from being called directly
@@ -21,9 +21,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 
-$worker_time = get_option('disk_usage_worker_time');
-
 define('DISK_USAGE_VERSION', '1.0.0');
+define('PLUGIN_OPTION_GROUP', 'wp_disk_usage_option_group');
 
 // Require once for the composer autoload
 if (file_exists(dirname( __FILE__ ) . '/vendor/autoload.php')) {

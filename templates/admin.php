@@ -1,19 +1,12 @@
 <?php
+defined( 'ABSPATH' ) || exit;
 
-//echo '<div class="wrap">';
-//echo '<h1>Disk Usage Plugin</h1>';
-//
-//echo '<h2>Results</h2>';
-//if ($usage_stats_exist) {
-//	echo '<p>Gathered disk usage stats:</p>';
-//} else {
-//	echo '<p>No usage stats found. Please click the button below to start gathering results.</p>';
-//}
-//
-
-//
-//echo '</div>';
-
+if( !current_user_can( 'administrator' ) ) {
+	wp_die(
+		__( "We're sorry, you're not allowed to access Disk Usage." )
+	);
+}
+$template_path = !$usage_stats_exist ? 'templates/admin-results.php' : 'templates/admin-instructions.php';
 ?>
 
 <div class="wrap">
@@ -23,11 +16,10 @@
 		<a href="#tab2" class="nav-tab">Controls</a>
 	</h2>
 	<div id="tab1" class="tab-panel">
-		<!-- Content for Tab 1 goes here -->
+		<?php require_once $this->plugin_path . $template_path?>
 	</div>
 	<div id="tab2" class="tab-panel">
-        <h2>Controls</h2>
-       <button id="gather-results-btn">Gather Results</button>
+		<?php require_once $this->plugin_path . 'templates/controls.php'?>
 	</div>
 </div>
 
