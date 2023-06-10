@@ -11,25 +11,34 @@ class Activate {
 
 	public static function activate()
 	{
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
 		global $wpdb;
-		$table_name = $wpdb->prefix . 'disk_usage';
+
+		$table_name = $wpdb->prefix . 'disk_usage_data';
+
 		$charset_collate = $wpdb->get_charset_collate();
 
-		// Define the table structure
-		$sql = "CREATE TABLE $table_name (
-    id INT(11) NOT NULL AUTO_INCREMENT,
-    state TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    PRIMARY KEY (id)
-                   ) ENGINE=InnoDB $charset_collate;";
+		$sql1 = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            file_path text NOT NULL,
+            parent_path text NOT NULL,
+            size bigint(20) NOT NULL,
+            file_count bigint(20) NOT NULL,
+            created_at DATETIME NOT NULL,
+            PRIMARY KEY  (id)
+        ) $charset_collate;";
 
-		// Create the table
+		$table_name = $wpdb->prefix . 'disk_usage_job_state';
+
+		$sql2 = "CREATE TABLE $table_name (
+            id INT NOT NULL AUTO_INCREMENT,
+            current_item INT NOT NULL,
+            total_items INT NOT NULL,
+            created_at DATETIME NOT NULL,
+            PRIMARY KEY (id)
+        ) $charset_collate;";
+
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		$wpdb->query($sql);
-
-		flush_rewrite_rules();
+		dbDelta($sql1);
+		dbDelta($sql2);
 	}
 }

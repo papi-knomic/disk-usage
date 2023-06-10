@@ -21,6 +21,10 @@
         .file-tree-container {
             font-family: Arial, sans-serif;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>

@@ -37,8 +37,8 @@ class Ajax extends BaseController
 				if (is_dir($itemPath)) {
 					$subfolder_data = $this->calculateDiskUsage($itemPath);
 					$data = [
+						'name' => $item,
 						'path' => $itemPath,
-						'size' => $subfolder_data['total_size'],
 						'percentage' => $subfolder_data['percentage'],
 						'subfolders' => $subfolder_data['directories'],
 						'files' => $subfolder_data['files']
@@ -48,9 +48,9 @@ class Ajax extends BaseController
 				} else {
 					$size = filesize($itemPath);
 					$data = [
+						'name' => $item,
 						'path' => $itemPath,
 						'size' => $this->formatSize($size),
-						'percentage' => ($size / $total) * 100
 					];
 					$result['files'][] = $data;
 					$total_usage += $size;
