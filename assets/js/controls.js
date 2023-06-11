@@ -35,7 +35,7 @@ jQuery(document).ready(function($) {
                     $('#progress-text').text('Scanning complete');
                     setTimeout(function (){
                         $('#progress-bar').hide()
-                        $(this).removeClass('disabled').removeAttr('disabled');
+                        $('#gather-results-btn').removeClass('disabled').removeAttr('disabled');
                     }, 5000)
                 }
                 // generateFileTree(response, $('#file-tree'));
@@ -53,46 +53,4 @@ jQuery(document).ready(function($) {
         var percentage = (progress / total) * 100;
         $('#progress-bar-fill').css('width', percentage + '%');
     }
-
-    // Traverse the file structure and generate the HTML file tree
-    function generateFileTree(data, parent) {
-        var ul = $('<ul>');
-
-        // Loop through directories
-        if (data.directories) {
-            $.each(data.directories, function(index, directory) {
-                var li = $('<li class="directory folder">').text(directory.name);
-
-                // Display file count and subdirectory count for directories
-                var count = directory.files.length + directory.subfolders.length;
-                li.append(' (' + count + ' items)');
-
-                ul.append(li);
-
-                // Recursively build the file tree for subdirectories
-                if (directory.subfolders) {
-                    generateFileTree(directory, li);
-                }
-            });
-        }
-
-        // Loop through files
-        if (data.files) {
-            $.each(data.files, function(index, file) {
-                var li = $('<li class="file">').text(file.name);
-
-                // Display file size for files
-                li.append(' (' + file.size + ' bytes)');
-
-                ul.append(li);
-            });
-        }
-        parent.append(ul);
-    }
-
-
 });
-
-
-
-// $(document)
