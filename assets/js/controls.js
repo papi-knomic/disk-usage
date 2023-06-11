@@ -33,10 +33,15 @@ jQuery(document).ready(function($) {
                     // Scanning complete
                     updateProgressBar(100, 100);
                     $('#progress-text').text('Scanning complete');
+
+                    $('.nav-tab').removeClass('nav-tab-active');
+                    $('.nav-tab:first').addClass('nav-tab-active');
+                    $('.tab-panel').hide();
+                    $($('.nav-tab:first').attr('href')).show();
                     setTimeout(function (){
                         $('#progress-bar').hide()
                         $('#gather-results-btn').removeClass('disabled').removeAttr('disabled');
-                    }, 5000)
+                    }, 3000)
                 }
                 // generateFileTree(response, $('#file-tree'));
             },

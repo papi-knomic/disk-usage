@@ -4,29 +4,34 @@ namespace includes\Base;
 
 class Options {
 	/**
+	 * Register the options settings
+	 *
 	 * @return void
 	 */
-	public function register() : void
+	public function register(): void
 	{
 		add_action('admin_init', [$this, 'registerSettings']);
 	}
 
 	/**
+	 * Register the plugin settings
+	 *
 	 * @return void
 	 */
-	public function registerSettings() : void {
+	public function registerSettings(): void
+	{
 		$option_group = 'wp_disk_usage_option_group';
-		$option_name  = 'disk_usage_worker_time';
+		$option_name = 'disk_usage_worker_time';
 
-		register_setting( $option_group, $option_name, [
+		register_setting($option_group, $option_name, [
 			'type' => 'integer',
 			'default' => 5,
-			'sanitize_callback' => 'absint'
-		] );
+			'sanitize_callback' => 'absint',
+		]);
 
-		$option = get_option( $option_name );
-		if ( empty( $option ) ) {
-			add_option( $option_name, 5 );
+		$option = get_option($option_name);
+		if (empty($option)) {
+			add_option($option_name, 5);
 		}
 
 		add_settings_section(
@@ -37,3 +42,4 @@ class Options {
 		);
 	}
 }
+

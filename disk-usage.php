@@ -8,50 +8,43 @@
  * Author: Samson Moses
  * Author URI: https://github.com/papi-knomic
  * Text Domain: wp-disk-usage
-*/
+ */
 
-//Stops file from being called directly
-if ( ! defined( 'WPINC' ) ) {
+// Stops file from being called directly
+if (!defined('WPINC')) {
 	die;
 }
 
-/**
- * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
- */
-
+// Define constants
 define('DISK_USAGE_VERSION', '1.0.0');
 define('PLUGIN_OPTION_GROUP', 'wp_disk_usage_option_group');
-define('PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define('JOB_STATE_TABLE', 'disk_usage_job_state' );
-define('FILE_DATA_TABLE', 'disk_usage_file_data' );
+define('PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('JOB_STATE_TABLE', 'disk_usage_job_state');
+define('FILE_DATA_TABLE', 'disk_usage_file_data');
 
-// Require once for the composer autoload
-if (file_exists(dirname( __FILE__ ) . '/vendor/autoload.php')) {
-	require_once dirname( __FILE__) . '/vendor/autoload.php';
+// Require the composer autoload file
+if (file_exists(dirname(__FILE__) . '/vendor/autoload.php')) {
+	require_once dirname(__FILE__) . '/vendor/autoload.php';
 }
 
-require_once( PLUGIN_DIR . 'includes/functions.php' );
+// Require the plugin functions file
+require_once(PLUGIN_DIR . 'includes/functions.php');
 
-
-/*
- * Plugin activation
- */
-function activatePlugin() {
+// Activate plugin
+function activatePlugin()
+{
 	\includes\Base\Activate::activate();
 }
 register_activation_hook(__FILE__, 'activatePlugin');
 
-/*
- * Plugin deactivation
- */
-function deactivatePlugin() {
+// Deactivate plugin
+function deactivatePlugin()
+{
 	\includes\Base\Deactivate::deactivate();
 }
+register_deactivation_hook(__FILE__, 'deactivatePlugin');
 
-register_deactivation_hook( __FILE__, 'deactivatePlugin');
-
-if ( class_exists( 'includes\\init' ) ) {
+// Register services on plugin initialization
+if (class_exists('includes\\Init')) {
 	includes\Init::registerServices();
 }

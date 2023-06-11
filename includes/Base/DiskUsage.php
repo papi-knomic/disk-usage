@@ -4,16 +4,25 @@ namespace includes\Base;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use stdClass;
 
+/**
+ * Class DiskUsage
+ * @package includes\Base
+ */
 class DiskUsage extends BaseController
 {
+	/**
+	 * Register hooks and actions
+	 */
 	public function register(): void
 	{
-		add_action('wp_ajax_gather_disk_usage_results', [ $this, 'gatherDiskUsageResults']);
-		add_action('wp_ajax_nopriv_gather_disk_usage_results', [ $this, 'gatherDiskUsageResults']);
+		add_action('wp_ajax_gather_disk_usage_results', [$this, 'gatherDiskUsageResults']);
+		add_action('wp_ajax_nopriv_gather_disk_usage_results', [$this, 'gatherDiskUsageResults']);
 	}
 
+	/**
+	 * Gather disk usage results via AJAX
+	 */
 	public function gatherDiskUsageResults(): void
 	{
 		$progress = sanitize_text_field($_POST['progress']);
@@ -21,11 +30,17 @@ class DiskUsage extends BaseController
 		wp_send_json($usage_stats);
 	}
 
-	private function scanDisk( int $progress ): array
+	/**
+	 * Scan the disk to calculate usage statistics
+	 *
+	 * @param int $progress The progress value
+	 * @return array The usage statistics
+	 */
+	private function scanDisk(int $progress): array
 	{
 		global $wpdb;
 
-		if ($progress == 0) {
+		if ($progress === 0) {
 			$this->truncateTable($wpdb->prefix . FILE_DATA_TABLE);
 			$this->truncateTable($wpdb->prefix . JOB_STATE_TABLE);
 		}
@@ -33,7 +48,7 @@ class DiskUsage extends BaseController
 		$usage_stats_exist = get_option('disk_usage_stats_exists');
 		$fileTypesData = get_option('disk_usage_file_types', []);
 
-		if ( !(bool)$usage_stats_exist ) {
+		if (!(bool)$usage_stats_exist) {
 			update_option('disk_usage_stats_exists', true);
 		}
 
@@ -41,14 +56,14 @@ class DiskUsage extends BaseController
 		$workerTime = get_option('disk_usage_worker_time', 5);
 		$startTime = time();
 		$totalFiles = $this->countFilesInDirectory(ABSPATH);
-		$currentFile =  $this->getCurrentItem();
+		$currentFile = $this->getCurrentItem();
 		$files = $this->getFileChunk($currentFile, $chunk);
 		$fileCount = 0;
 
-		foreach ($files as $file ) {
+		foreach ($files as $file) {
 			$fileCount++;
 			$currentFile++;
-			$this->saveFileData( $file, $wpdb);
+			$this->saveFileData($file, $wpdb);
 			$this->saveJobState($currentFile, $totalFiles, $wpdb);
 
 			// Get the file extension
@@ -70,7 +85,7 @@ class DiskUsage extends BaseController
 
 			$elapsedTime = time() - $startTime;
 
-			if ($elapsedTime >= $workerTime || $currentFile == $totalFiles || $fileCount == count($files) ){
+			if ($elapsedTime >= $workerTime || $currentFile == $totalFiles || $fileCount == count($files)) {
 				update_option('disk_usage_file_types', $fileTypesData);
 				return [
 					'total' => $totalFiles,
@@ -87,13 +102,26 @@ class DiskUsage extends BaseController
 		];
 	}
 
-	private function truncateTable(string $tableName) : void
+	/**
+	 * Truncate a database table
+	 *
+	 * @param string $tableName The name of the table to truncate
+	 */
+	private function truncateTable(string $tableName): void
 	{
 		global $wpdb;
 		$wpdb->query("TRUNCATE TABLE $tableName");
 	}
 
-	private function getFileChunk($start, $count): array
+	/**
+	 * Get a chunk of files from a given start position
+	 *
+	 * @param int $start The start position
+	 * @param int $count The number of files to retrieve
+	 *
+	 * @return array The files in the chunk
+	 */
+	private function getFileChunk( int $start, int $count): array
 	{
 		$files = [];
 		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(ABSPATH));
@@ -114,6 +142,11 @@ class DiskUsage extends BaseController
 		return $files;
 	}
 
+	/**
+	 * Get the current item from the database job state
+	 *
+	 * @return int|null The current item or null if not found
+	 */
 	private function getCurrentItem(): ?int
 	{
 		global $wpdb;
@@ -124,19 +157,32 @@ class DiskUsage extends BaseController
 		return $wpdb->get_var($query) ?? 0;
 	}
 
-	private function countFilesInDirectory($path): int
+	/**
+	 * Count the number of files in a directory recursively
+	 *
+	 * @param string $path The directory path
+	 *
+	 * @return int The number of files
+	 */
+	private function countFilesInDirectory( string $path): int
 	{
 		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
 
 		return iterator_count($iterator);
 	}
 
+	/**
+	 * Save file data to the database
+	 *
+	 * @param mixed $item The file or directory item
+	 * @param mixed $wpdb The WordPress database object
+	 */
 	private function saveFileData($item, $wpdb)
 	{
 		$path = $item->getPath();
 		$realPath = $item->getPathname();
 
-		if ( str_contains( $realPath, ".." ) ) {
+		if (str_contains($realPath, "..")) {
 			return;
 		}
 
@@ -165,7 +211,14 @@ class DiskUsage extends BaseController
 		}
 	}
 
-	private function saveJobState( int $currentFile, int $totalFiles, $wpdb ) : void
+	/**
+	 * Save the current job state to the database
+	 *
+	 * @param int $currentFile The current file number
+	 * @param int $totalFiles The total number of files
+	 * @param mixed $wpdb The WordPress database object
+	 */
+	private function saveJobState(int $currentFile, int $totalFiles, $wpdb): void
 	{
 		$table_name = $wpdb->prefix . JOB_STATE_TABLE;
 
@@ -184,7 +237,14 @@ class DiskUsage extends BaseController
 		}
 	}
 
-	private function getFolderSize($folderPath): int
+	/**
+	 * Get the size of a folder recursively
+	 *
+	 * @param string $folderPath The folder path
+	 *
+	 * @return int The total size of the folder in bytes
+	 */
+	private function getFolderSize( string $folderPath): int
 	{
 		$totalSize = 0;
 

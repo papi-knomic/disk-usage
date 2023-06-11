@@ -1,23 +1,39 @@
 <?php
 
-
 /**
- *
- * @package alumunite-event
+ * @package wp-disk-usage
  */
 
 namespace includes\Base;
 
-class BaseController{
-    public $plugin_path;
-    public $plugin_url;
-    public $plugin;
+/**
+ * Class BaseController
+ * @package includes\Base
+ */
+class BaseController
+{
+	/**
+	 * @var string Plugin directory path
+	 */
+	public string $plugin_path;
 
-    public function __construct()
-    {
-        $this->plugin_path = plugin_dir_path( dirname( __FILE__, 2 ) );
-        $this->plugin_url = plugin_dir_url( dirname( __FILE__, 2 ) );
-        $this->plugin = plugin_basename( dirname( __FILE__, 3 ) ) .  '/disk-usageSettings.php.php';
-    }
+	/**
+	 * @var string Plugin directory URL
+	 */
+	public string $plugin_url;
 
+	/**
+	 * @var string Plugin file
+	 */
+	public string $plugin;
+
+	/**
+	 * BaseController constructor.
+	 */
+	public function __construct()
+	{
+		$this->plugin_path = plugin_dir_path(dirname(__FILE__, 2));
+		$this->plugin_url = plugin_dir_url(dirname(__FILE__, 2));
+		$this->plugin = plugin_basename(dirname(__FILE__, 3)) . '/disk-usageSettings.php.php';
+	}
 }

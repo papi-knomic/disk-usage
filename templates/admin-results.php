@@ -3,7 +3,7 @@ $fileTypesData = get_option('disk_usage_file_types');
 
 if (!empty($fileTypesData)) {
 	// Sort the file types data by size in descending order
-	function sortBySize($a, $b) {
+	function sortBySize($a, $b): int {
 		if ($a['size'] == $b['size']) {
 			return 0;
 		}

@@ -1,20 +1,25 @@
 <?php
 
 /**
- *
- * @package disk-usage
+ * @package wp-disk-usage
  */
 
 namespace includes\Base;
 
-class Activate {
-
+/**
+ * Class Activate
+ * @package includes\Base
+ */
+class Activate
+{
+	/**
+	 * Activate the plugin.
+	 */
 	public static function activate()
 	{
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . FILE_DATA_TABLE;
-
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$sql1 = "CREATE TABLE $table_name (
