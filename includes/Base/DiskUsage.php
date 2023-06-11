@@ -43,6 +43,7 @@ class DiskUsage extends BaseController
 		if ($progress === 0) {
 			$this->truncateTable($wpdb->prefix . FILE_DATA_TABLE);
 			$this->truncateTable($wpdb->prefix . JOB_STATE_TABLE);
+			delete_option('disk_usage_file_types');
 		}
 
 		$usage_stats_exist = get_option('disk_usage_stats_exists');
@@ -64,7 +65,6 @@ class DiskUsage extends BaseController
 			$fileCount++;
 			$currentFile++;
 			$this->saveFileData($file, $wpdb);
-			$this->saveJobState($currentFile, $totalFiles, $wpdb);
 
 			// Get the file extension
 			$fileExtension = pathinfo($file->getFilename(), PATHINFO_EXTENSION);
@@ -87,6 +87,7 @@ class DiskUsage extends BaseController
 
 			if ($elapsedTime >= $workerTime || $currentFile == $totalFiles || $fileCount == count($files)) {
 				update_option('disk_usage_file_types', $fileTypesData);
+				$this->saveJobState($currentFile, $totalFiles, $wpdb);
 				return [
 					'total' => $totalFiles,
 					'progress' => $currentFile
@@ -95,6 +96,7 @@ class DiskUsage extends BaseController
 		}
 
 		update_option('disk_usage_file_types', $fileTypesData);
+		$this->saveJobState($currentFile, $totalFiles, $wpdb);
 
 		return [
 			'total' => 100,
@@ -200,7 +202,7 @@ class DiskUsage extends BaseController
 			$table_name = $wpdb->prefix . FILE_DATA_TABLE;
 
 			$data = [
-				'name' => $item->getBasename(),
+				'file_name' => $item->getBasename(),
 				'file_path' => $realPath,
 				'parent_path' => $parent,
 				'size' => $size,

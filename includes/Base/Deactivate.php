@@ -28,5 +28,9 @@ class Deactivate
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 		dbDelta($sql1);
 		dbDelta($sql2);
+
+		delete_option('disk_usage_stats_exists');
+		delete_option('disk_usage_file_types');
+		delete_option('disk_usage_worker_time');
 	}
 }

@@ -34,6 +34,7 @@ jQuery(document).ready(function($) {
                     updateProgressBar(100, 100);
                     $('#progress-text').text('Scanning complete');
 
+                    $('#tab1').load(' #tab1 > *')
                     $('.nav-tab').removeClass('nav-tab-active');
                     $('.nav-tab:first').addClass('nav-tab-active');
                     $('.tab-panel').hide();
@@ -41,6 +42,7 @@ jQuery(document).ready(function($) {
                     setTimeout(function (){
                         $('#progress-bar').hide()
                         $('#gather-results-btn').removeClass('disabled').removeAttr('disabled');
+                        $('#tab1').load(' #tab1 > *')
                     }, 3000)
                 }
                 // generateFileTree(response, $('#file-tree'));
