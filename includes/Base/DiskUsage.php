@@ -21,7 +21,7 @@ class DiskUsage extends BaseController
 		wp_send_json($usage_stats);
 	}
 
-	private function scanDisk( int $progress )
+	private function scanDisk( int $progress ): array
 	{
 		global $wpdb;
 
@@ -256,6 +256,5 @@ class DiskUsage extends BaseController
 
 		return $fileTree;
 	}
-
 
 }

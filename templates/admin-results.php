@@ -1,43 +1,47 @@
-<head>
-    <style>
-        ul {
-            list-style-type: none;
-            padding-left: 20px;
-        }
+<?php
+$fileTypesData = get_option('disk_usage_file_types');
 
-        li {
-            margin: 5px 0;
-            cursor: pointer;
-        }
+if (!empty($fileTypesData)) {
+	// Sort the file types data by size in descending order
+	function sortBySize($a, $b) {
+		if ($a['size'] == $b['size']) {
+			return 0;
+		}
+		return ($a['size'] > $b['size']) ? -1 : 1;
+	}
 
-        .file {
-            color: blue;
-        }
+	// Sort the file types data using the custom sorting key function
+	uasort($fileTypesData, 'sortBySize');
 
-        .folder {
-            color: green;
-        }
+	// Define the number of rows to display initially and the total number of rows
+	$rowsToShow = 5;
+	$totalRows = count($fileTypesData);
 
-        .file-tree-container {
-            font-family: Arial, sans-serif;
-        }
+	echo '<div class="file-types-table-container">';
+	echo '<button id="toggle-button" class="button">Show More</button>';
+	echo '<table class="wp-list-table widefat fixed striped">';
+	echo '<thead><tr><th scope="col">Extension</th><th scope="col">Count</th><th scope="col">Size</th></tr></thead>';
+	echo '<tbody>';
 
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-<div class="file-tree-container">
-    <ul id="file-tree">
-        <!-- File tree will be generated here -->
-    </ul>
-</div>
+	$rowCount = 0;
+	foreach ($fileTypesData as $extension => $data) {
+		if ($rowCount >= $rowsToShow) {
+			echo '<tr class="hidden">';
+		} else {
+			echo '<tr>';
+		}
 
-</body>
+		echo '<td>' . $extension . '</td>';
+		echo '<td>' . $data['count'] . '</td>';
+		echo '<td>' . formatBytes($data['size']) . '</td>';
+		echo '</tr>';
 
+		$rowCount++;
+	}
 
-
-
-
-
+	echo '</tbody>';
+	echo '</table>';
+	echo '</div>';
+} else {
+	echo 'No file types data available.';
+}

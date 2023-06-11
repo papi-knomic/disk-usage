@@ -53,3 +53,28 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+.file-types-table-container {
+    position: relative;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px;
+}
+
+.wp-list-table tbody tr.hidden {
+    display: none;
+}
+
+.file-types-table-container.show-all .wp-list-table tbody tr {
+    display: table-row;
+}
+
+.file-types-table-container.show-all .wp-list-table tbody tr.hidden {
+    display: none;
+}
