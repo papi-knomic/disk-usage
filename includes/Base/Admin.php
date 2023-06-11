@@ -43,6 +43,7 @@ class Admin extends BaseController
 	{
 		$usage_stats_exist = get_option('disk_usage_stats_exists');
 		$usage_stats_exist = (bool)$usage_stats_exist ?? false;
+		$files = ( new DiskUsage())->generateFileTree();
 
 		require_once $this->plugin_path . 'templates/admin.php';
 	}

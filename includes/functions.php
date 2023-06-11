@@ -11,3 +11,8 @@ function formatBytes($bytes, $precision = 2): string
 
 	return round($bytes, $precision) . ' ' . $units[$pow];
 }
+
+function is_windows_os(): bool
+{
+	return PHP_OS == 'WINNT' ;
+}

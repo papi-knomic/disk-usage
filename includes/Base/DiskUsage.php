@@ -317,4 +317,22 @@ class DiskUsage extends BaseController
 		return $fileTree;
 	}
 
+
+	public function getFileData(): array{
+		// Assuming you have a database connection established and the appropriate query executed
+		$result = mysqli_query($conn, "SELECT * FROM FILE_DATA_TABLE");
+
+// Create an empty array to store the table data
+		$tableData = array();
+
+// Fetch each row from the result set and add it to the array
+		while ($row = mysqli_fetch_assoc($result)) {
+			$tableData[] = $row;
+		}
+
+// Print the array to verify the data
+		print_r($tableData);
+		return $tableData;
+	}
+
 }
