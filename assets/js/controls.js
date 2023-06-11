@@ -1,5 +1,11 @@
 jQuery(document).ready(function($) {
     $('#gather-results-btn').on('click', function() {
+        scanFile()
+    });
+
+    function scanFile(progress)
+    {
+        console.log(progress)
         // Show a loading indicator or progress bar
         // Add your code to display the data gathering process window or portion of the screen
 
@@ -9,10 +15,15 @@ jQuery(document).ready(function($) {
             type: 'POST',
             dataType: 'json',
             data: {
-                action: 'gather_disk_usage_results' // Replace with your AJAX action name
+                action: 'gather_disk_usage_results',
+                progress: progress ?? 0// Replace with your AJAX action name
             },
             success: function(response) {
-                generateFileTree(response, $('#file-tree'));
+                if (response.progress < response.total ){
+                    console.log(response.progress)
+                    scanFile(response.progress)
+                }
+                // generateFileTree(response, $('#file-tree'));
             },
             error: function(xhr, status, error) {
                 // Handle the error case
@@ -23,7 +34,7 @@ jQuery(document).ready(function($) {
                 // Add your code to hide the data gathering process window or portion of the screen
             }
         });
-    });
+    }
 
     // Traverse the file structure and generate the HTML file tree
     function generateFileTree(data, parent) {
@@ -66,6 +77,4 @@ jQuery(document).ready(function($) {
 
 
 
-// $(document).ready(function() {
-//
-// });
+// $(document)

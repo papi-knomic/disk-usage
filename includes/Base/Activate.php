@@ -13,7 +13,7 @@ class Activate {
 	{
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . 'disk_usage_data';
+		$table_name = $wpdb->prefix . FILE_DATA_TABLE;
 
 		$charset_collate = $wpdb->get_charset_collate();
 
@@ -27,12 +27,12 @@ class Activate {
             PRIMARY KEY  (id)
         ) $charset_collate;";
 
-		$table_name = $wpdb->prefix . 'disk_usage_job_state';
+		$table_name = $wpdb->prefix . JOB_STATE_TABLE;
 
 		$sql2 = "CREATE TABLE $table_name (
             id INT NOT NULL AUTO_INCREMENT,
-            current_item INT NOT NULL,
-            total_items INT NOT NULL,
+            current_file INT NOT NULL,
+            total_files INT NOT NULL,
             created_at DATETIME NOT NULL,
             PRIMARY KEY (id)
         ) $charset_collate;";

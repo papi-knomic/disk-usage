@@ -3,7 +3,7 @@
 namespace includes;
 
 use includes\Base\Admin;
-use includes\Base\Ajax;
+use includes\Base\DiskUsage;
 use includes\Base\Enqueue;
 use includes\Base\Options;
 
@@ -18,7 +18,7 @@ class Init {
 			Admin::class,
 			Options::class,
 			Enqueue::class,
-			Ajax::class
+			DiskUsage::class
 		];
 	}
 

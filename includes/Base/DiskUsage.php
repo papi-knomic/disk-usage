@@ -2,74 +2,178 @@
 
 namespace includes\Base;
 
-class DiskUsage {
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use stdClass;
 
-	private function calculateDiskUsage($directory): array
+class DiskUsage extends BaseController
+{
+	public function register(): void
 	{
-		$total_usage = 0;
-		$file_types = [];
+		add_action('wp_ajax_gather_disk_usage_results', [ $this, 'gatherDiskUsageResults']);
+		add_action('wp_ajax_nopriv_gather_disk_usage_results', [ $this, 'gatherDiskUsageResults']);
+	}
 
-		// Recursively calculate the disk usage of files and directories
-		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS));
-		foreach ($iterator as $file) {
-			// Exclude certain file types if needed
-			if ($this->shouldExcludeFileType($file)) {
-				continue;
-			}
+	public function gatherDiskUsageResults(): void
+	{
+		$progress = sanitize_text_field($_POST['progress']);
+		$usage_stats = $this->scanDisk($progress);
+		wp_send_json($usage_stats);
+	}
 
-			$size = $file->getSize();
-			$total_usage += $size;
+	private function scanDisk( int $progress )
+	{
+		global $wpdb;
 
-			// Group the files by file type
-			$file_type = $file->getExtension();
-			if (!isset($file_types[$file_type])) {
-				$file_types[$file_type] = 0;
-			}
-			$file_types[$file_type] += $size;
+		if ($progress == 0) {
+			$this->truncateTable($wpdb->prefix . FILE_DATA_TABLE);
+			$this->truncateTable($wpdb->prefix . JOB_STATE_TABLE);
 		}
 
-		// Sort the file types by size in descending order
-		arsort($file_types);
+		$chunk = 100;
+		$workerTime = get_option('disk_usage_worker_time', 5);
+		$startTime = time();
+		$totalFiles = $this->countFilesInDirectory(ABSPATH);
+		$currentFile =  $this->getCurrentItem();
+		$files = $this->getFileChunk($currentFile, $chunk);
+		$fileCount = 0;
 
-		// Convert the sizes to human-readable format
-		$total_usage_formatted = $this->formatSize($total_usage);
-		foreach ($file_types as $file_type => &$size) {
-			$size = $this->formatSize($size);
+		foreach ($files as $file ) {
+			$fileCount++;
+			$currentFile++;
+			$this->saveFileData( $file, $wpdb);
+			$this->saveJobState($currentFile, $totalFiles, $wpdb);
+
+			$elapsedTime = time() - $startTime;
+
+			if ($elapsedTime >= $workerTime || $currentFile == $totalFiles || $fileCount == count($files) ){
+				return [
+					'total' => $totalFiles,
+					'progress' => $currentFile
+				];
+			}
 		}
-		$total = disk_total_space('/');
-		// Return the disk usage statistics
+
 		return [
-			'total_usage' => $total_usage_formatted,
-			'file_types' => $file_types,
-			'percentage' => ($total_usage/$total)*100,
-			'total_size' => $this->formatSize($total)
+			'total' => 100,
+			'progress' => 100
 		];
 	}
 
-	private function shouldExcludeFileType(SplFileInfo $file): bool
+	private function truncateTable(string $tableName) : void
 	{
-		// Define the file types to exclude from the disk usage calculations
-		$excluded_file_types = ['tmp', 'log'];
-
-		// Exclude files with specified extensions
-		$extension = $file->getExtension();
-		if (in_array($extension, $excluded_file_types)) {
-			return true;
-		}
-
-		return false;
+		global $wpdb;
+		$wpdb->query("TRUNCATE TABLE $tableName");
 	}
 
-	private function formatSize($size): string
+	private function getFileChunk($start, $count): array
 	{
-		$units = ['B', 'KB', 'MB', 'GB', 'TB'];
-		$index = 0;
+		$files = [];
+		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(ABSPATH));
+		$fileCount = 0;
+		$doneCount = 0;
 
-		while ($size >= 1024 && $index < count($units) - 1) {
-			$size /= 1024;
-			$index++;
+		foreach ($iterator as $file) {
+			$fileCount++;
+			if ($fileCount >= $start) {
+				$files[] = $file;
+				$doneCount++;
+				if ($doneCount >= $count) {
+					break;
+				}
+			}
 		}
 
-		return round($size, 2) . ' ' . $units[$index];
+		return $files;
 	}
+
+	private function getCurrentItem(): ?int
+	{
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . JOB_STATE_TABLE;
+		$query = $wpdb->prepare("SELECT current_file FROM $table_name");
+
+		return $wpdb->get_var($query) ?? 0;
+	}
+
+	private function countFilesInDirectory($path): int {
+		$iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+
+		return iterator_count($iterator);
+	}
+
+
+	private function saveFileData($item, $wpdb)
+	{
+		$path = $item->getPath();
+		$realPath = $item->getPathname();
+
+		if (strpos($realPath, "..") !== false) {
+			return;
+		}
+
+		if (ABSPATH != $realPath) {
+			$parent = (ABSPATH != $path) ? $path : "";
+			if ($item->isDir()) {
+				$lastSlashPosition = strrpos($path, '/');
+				if ($lastSlashPosition !== false) {
+					$parent = substr($path, 0, $lastSlashPosition);
+				}
+			}
+
+			$size = ($item->isFile()) ? $item->getSize() : $this->getFolderSize($realPath);
+			$fileCount = ($item->isDir()) ? $this->countFilesInDirectory($realPath) : 0;
+			$table_name = $wpdb->prefix . FILE_DATA_TABLE;
+
+			$data = array(
+				'file_path' => $realPath,
+				'parent_path' => $parent,
+				'size' => $size,
+				'file_count' => $fileCount,
+				'created_at' => current_time('mysql'),
+			);
+
+			$wpdb->insert($table_name, $data);
+		}
+	}
+
+	private function saveJobState( int $currentFile, int $totalFiles, $wpdb ) : void
+	{
+		$table_name = $wpdb->prefix . JOB_STATE_TABLE;
+
+		$data = [
+			'current_file' => $currentFile,
+			'total_files' => $totalFiles,
+			'created_at' => current_time('mysql'),
+		];
+
+		$row = $wpdb->get_row("SELECT * FROM $table_name");
+
+		if ($row) {
+			$wpdb->update($table_name, $data, ['id' => $row->id]);
+		} else {
+			$wpdb->insert($table_name, $data);
+		}
+	}
+
+	private function getFolderSize($folderPath): int
+	{
+		$totalSize = 0;
+
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator($folderPath),
+			RecursiveIteratorIterator::LEAVES_ONLY
+		);
+
+		foreach ($iterator as $file) {
+			if ($file->isFile()) {
+				$totalSize += $file->getSize();
+			}
+		}
+
+		return $totalSize;
+	}
+
+
 }

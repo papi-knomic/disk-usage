@@ -23,11 +23,16 @@ if ( ! defined( 'WPINC' ) ) {
 
 define('DISK_USAGE_VERSION', '1.0.0');
 define('PLUGIN_OPTION_GROUP', 'wp_disk_usage_option_group');
+define('PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define('JOB_STATE_TABLE', 'disk_usage_job_state' );
+define('FILE_DATA_TABLE', 'disk_usage_file_data' );
 
 // Require once for the composer autoload
 if (file_exists(dirname( __FILE__ ) . '/vendor/autoload.php')) {
 	require_once dirname( __FILE__) . '/vendor/autoload.php';
 }
+
+require_once( PLUGIN_DIR . 'includes/functions.php' );
 
 
 /*
