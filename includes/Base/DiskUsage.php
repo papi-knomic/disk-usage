@@ -200,6 +200,7 @@ class DiskUsage extends BaseController
 			$table_name = $wpdb->prefix . FILE_DATA_TABLE;
 
 			$data = [
+				'name' => $item->getBasename(),
 				'file_path' => $realPath,
 				'parent_path' => $parent,
 				'size' => $size,

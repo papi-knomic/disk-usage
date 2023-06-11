@@ -24,6 +24,7 @@ class Activate
 
 		$sql1 = "CREATE TABLE $table_name (
             id mediumint(9) NOT NULL AUTO_INCREMENT,
+            file_name text NOT NULL,
             file_path text NOT NULL,
             parent_path text NOT NULL,
             size bigint(20) NOT NULL,
