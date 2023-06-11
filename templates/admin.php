@@ -6,7 +6,7 @@ if( !current_user_can( 'administrator' ) ) {
 		__( "We're sorry, you're not allowed to access Disk Usage." )
 	);
 }
-$template_path = !$usage_stats_exist ? 'templates/admin-results.php' : 'templates/admin-instructions.php';
+$template_path = $usage_stats_exist ? 'templates/admin-results.php' : 'templates/admin-instructions.php';
 ?>
 
 <div class="wrap">

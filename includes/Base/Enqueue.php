@@ -19,6 +19,7 @@ class Enqueue extends BaseController
     public function enqueue()
     {
         if ( is_admin() ) {
+			wp_enqueue_style('disk_usage_index_css', $this->plugin_url . 'assets/css/index.css');
             wp_enqueue_script('disk_usage_index', $this->plugin_url . 'assets/js/index.js');
             wp_enqueue_script('disk_usage_controls', $this->plugin_url . 'assets/js/controls.js');
         }

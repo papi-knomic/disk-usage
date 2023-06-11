@@ -1,15 +1,18 @@
 jQuery(document).ready(function($) {
+    $('#progress-bar').hide();
     $('#gather-results-btn').on('click', function() {
+        $(this).addClass('disabled').attr('disabled', 'disabled');
+        updateProgressBar(0,100)
         scanFile()
     });
 
-    function scanFile(progress)
-    {
-        console.log(progress)
-        // Show a loading indicator or progress bar
-        // Add your code to display the data gathering process window or portion of the screen
+    function scanFile(progress) {
+        // Show the progress bar and text
+        if ( !progress || progress == 0 ) {
+            $('#progress-bar').show();
+            $('#progress-text').text('Scanning...');
+        }
 
-        // Perform AJAX calls to gather the results
         $.ajax({
             url: ajaxurl,
             type: 'POST',
@@ -20,8 +23,20 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {
                 if (response.progress < response.total ){
-                    console.log(response.progress)
-                    scanFile(response.progress)
+                    var percentage = (response.progress / response.total) * 100;
+                    updateProgressBar(response.progress, response.total);
+                    $('#progress-text').text('Scanning: ' + percentage.toFixed(0) + '%');
+                    setTimeout( function (){
+                        scanFile(response.progress)
+                    }, 1000)
+                }else {
+                    // Scanning complete
+                    updateProgressBar(100, 100);
+                    $('#progress-text').text('Scanning complete');
+                    setTimeout(function (){
+                        $('#progress-bar').hide()
+                        $(this).removeClass('disabled').removeAttr('disabled');
+                    }, 5000)
                 }
                 // generateFileTree(response, $('#file-tree'));
             },
@@ -30,10 +45,13 @@ jQuery(document).ready(function($) {
                 console.error(error);
             },
             complete: function() {
-                // Hide the loading indicator or progress bar
-                // Add your code to hide the data gathering process window or portion of the screen
             }
         });
+    }
+
+    function updateProgressBar(progress, total) {
+        var percentage = (progress / total) * 100;
+        $('#progress-bar-fill').css('width', percentage + '%');
     }
 
     // Traverse the file structure and generate the HTML file tree

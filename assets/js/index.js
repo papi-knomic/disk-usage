@@ -1,6 +1,7 @@
 jQuery(document).ready(function($) {
     $('.tab-panel').hide();
-    $('.nav-tab-active').show()
+    $($('.nav-tab-active').attr('href')).show();
+
     $('.nav-tab').click(function(e) {
         e.preventDefault();
 
